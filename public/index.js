@@ -6,6 +6,7 @@ const grid = new Grid({
 
   features: {
     filter: true,
+    group: false,
   },
 
   columns: [
@@ -60,6 +61,11 @@ const grid = new Grid({
   ],
   store: {
     fields: ["sortIndex", "age", "city", "food", "name", "email"],
+    lazyLoad: {
+      chunkSize: 100, // default value
+      totalCountProperty: "total", // default value
+      dataProperty: "data", // default value
+    },
     readUrl: "http://localhost:1337/read",
     createUrl: "http://localhost:1337/create",
     deleteUrl: "http://localhost:1337/delete",
@@ -70,6 +76,14 @@ const grid = new Grid({
     sortParamName: "sort",
     filterParamName: "filter",
     listeners: {
+      lazyLoadStarted() {
+        grid.widgetMap.addButton.disabled = true;
+        updateNetworkValue("Loading", "blue");
+      },
+      lazyLoadEnded() {
+        grid.widgetMap.addButton.disabled = false;
+        updateNetworkValue();
+      },
       beforeCommit() {
         updateNetworkValue("Committing", "red");
       },

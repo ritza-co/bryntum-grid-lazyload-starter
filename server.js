@@ -85,14 +85,55 @@ app.listen(port, () => {
 
 async function serverConfig() {
   app.get("/read", async (req, res) => {
+    const { query } = req,
+      { sort, filter } = query, // Params provided by the client
+      startIndex = parseInt(query.startIndex),
+      count = parseInt(query.count);
     let data = getData(req);
-    
+
+    // We got a sort param (JSON encoded array of objects)
+    if (sort) {
+      const decoded = JSON.parse(sort);
+
+      // Each object has 2 properties, field (string) and ascending (boolean)
+      for (const { ascending, field } of decoded) {
+        sortData(req, data, field, ascending);
+      }
+    }
+    // If no sorters, sort with default values
+    else if (req.session.dataIsSorted) {
+      sortData(req, data);
+    }
+
+    // We got a filter param (JSON encoded array of objects)
+    if (filter) {
+      const decoded = JSON.parse(filter);
+      // Each filter object has 4 properties:
+      // * field (string)
+      // operator (=,*,>,< supported in this backend)
+      // value
+      // caseSensitive (boolean)
+      for (const { field, operator, value, caseSensitive } of decoded) {
+        const evaluator = filterEvaluators[operator], // The evaluation function matching current operator
+          filterValue = caseSensitive ? value : value?.toLowerCase?.();
+
+        data = data.filter((r) =>
+          evaluator(
+            caseSensitive ? r[field] : r[field]?.toLowerCase?.(),
+            filterValue,
+            caseSensitive
+          )
+        );
+      }
+    }
+
     await new Promise((resolve) => setTimeout(resolve, fakeDelay));
 
     // Return the expected JSON response
     res.json({
       success: true,
-      data: data,
+      total: data.length,
+      data: data.slice(startIndex, startIndex + count),
     });
   });
 
