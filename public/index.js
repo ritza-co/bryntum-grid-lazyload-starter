@@ -63,8 +63,6 @@ const grid = new Grid({
     fields: ["sortIndex", "age", "city", "food", "name", "email"],
     lazyLoad: {
       chunkSize: 100, // default value
-      totalCountProperty: "total", // default value
-      dataProperty: "data", // default value
     },
     readUrl: "http://localhost:1337/read",
     createUrl: "http://localhost:1337/create",
