@@ -101,7 +101,7 @@ async function serverConfig() {
       records = req.body.data; // We get the added records as an array of objects
     let maxId = data.reduce((acc, r) => (r.id > acc ? r.id : acc), 0);
 
-    // Create unique id's for all added records
+    // Create unique ids for all added records
     records.forEach((r) => (r.id = maxId += 1));
 
     // Add the records to the session "database"
@@ -118,7 +118,7 @@ async function serverConfig() {
   });
 
   app.post("/delete", async (req, res) => {
-    const { ids } = req.body, // We get the id's to delete as an array
+    const { ids } = req.body, // We get the ids to delete as an array
       data = getData(req);
 
     // Remove records from the session "database"
