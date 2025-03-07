@@ -114,16 +114,21 @@ async function serverConfig() {
       // value
       // caseSensitive (boolean)
       for (const { field, operator, value, caseSensitive } of decoded) {
-        const evaluator = filterEvaluators[operator], // The evaluation function matching current operator
-          filterValue = caseSensitive ? value : value?.toLowerCase?.();
+        const evaluator = filterEvaluators[operator]; // The evaluation function matching current operator
 
-        data = data.filter((r) =>
-          evaluator(
-            caseSensitive ? r[field] : r[field]?.toLowerCase?.(),
-            filterValue,
-            caseSensitive
-          )
-        );
+        let filterValue = value;
+        if (!caseSensitive && typeof value === "string") {
+          filterValue = value.toLowerCase();
+        }
+
+        data = data.filter((r) => {
+          let fieldValue = r[field];
+          if (!caseSensitive && typeof fieldValue === "string") {
+            fieldValue = fieldValue.toLowerCase();
+          }
+
+          return evaluator(fieldValue, filterValue, caseSensitive);
+        });
       }
     }
 
