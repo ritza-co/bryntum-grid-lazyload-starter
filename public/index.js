@@ -5,7 +5,9 @@ const grid = new Grid({
   selectionMode: { rowNumber: true },
 
   features: {
-    filter: true,
+    filter: {
+      allowedOperators: ["*", "=", "<", ">"],
+    },
   },
 
   columns: [
